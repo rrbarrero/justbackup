@@ -42,7 +42,7 @@ func (c *Client) Get(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -71,7 +71,7 @@ func (c *Client) Post(path string, body io.Reader) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {

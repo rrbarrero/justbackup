@@ -56,7 +56,7 @@ func (s *RestoreService) ExecuteLocal(params LocalRestoreParams) error {
 	if err != nil {
 		return fmt.Errorf("error starting listener: %w", err)
 	}
-	defer listener.Close()
+	defer func() { _ = listener.Close() }()
 
 	// 3. Determine Address
 	restoreAddr := params.CustomAddr
@@ -91,7 +91,7 @@ func (s *RestoreService) ExecuteLocal(params LocalRestoreParams) error {
 	if err != nil {
 		return err
 	}
-	defer stream.Close()
+	defer func() { _ = stream.Close() }()
 
 	fmt.Println("Token validated. Receiving data...")
 

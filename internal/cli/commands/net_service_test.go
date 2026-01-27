@@ -26,7 +26,7 @@ func TestNetService_ListenTCP(t *testing.T) {
 	if listener == nil {
 		t.Fatal("expected listener to be non-nil")
 	}
-	defer listener.Close()
+	defer func() { _ = listener.Close() }()
 
 	if host == "" {
 		t.Error("expected non-empty host")
@@ -54,8 +54,8 @@ func TestNetService_ExtractTarGz(t *testing.T) {
 	if _, err := tr.Write(content); err != nil {
 		t.Fatal(err)
 	}
-	tr.Close()
-	gz.Close()
+	_ = tr.Close()
+	_ = gz.Close()
 
 	dest := t.TempDir()
 	if err := svc.ExtractTarGz(buf, dest); err != nil {

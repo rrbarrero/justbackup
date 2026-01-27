@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/rrbarrero/justbackup/internal/notification/application"
@@ -52,11 +53,13 @@ func (h *NotificationHandler) GetSettings(w http.ResponseWriter, r *http.Request
 	settings, err := h.service.GetSettings(r.Context(), userID, providerType)
 	if err == domain.ErrNotFound {
 		// Return empty default settings instead of 404 for better UX
-		_ = json.NewEncoder(w).Encode(dto.NotificationSettingsResponse{
+		if err := json.NewEncoder(w).Encode(dto.NotificationSettingsResponse{
 			ProviderType: providerType,
 			Config:       make(map[string]interface{}),
 			Enabled:      false,
-		})
+		}); err != nil {
+			log.Printf("Failed to encode response: %v", err)
+		}
 		return
 	}
 	if err != nil {
@@ -78,7 +81,9 @@ func (h *NotificationHandler) GetSettings(w http.ResponseWriter, r *http.Request
 		Enabled:      settings.Enabled,
 	}
 
-	_ = json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Update notification settings

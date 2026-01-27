@@ -19,7 +19,7 @@ import (
 func TestHostRepositoryPostgres_Save(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewHostRepositoryPostgres(db)
 
@@ -118,7 +118,7 @@ func TestHostRepositoryPostgres_Save(t *testing.T) {
 func TestHostRepositoryPostgres_Get(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewHostRepositoryPostgres(db)
 
@@ -186,7 +186,7 @@ func TestHostRepositoryPostgres_Get(t *testing.T) {
 func TestHostRepositoryPostgres_GetByIDs(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewHostRepositoryPostgres(db)
 
@@ -254,7 +254,7 @@ func TestHostRepositoryPostgres_GetByIDs(t *testing.T) {
 func TestHostRepositoryPostgres_List(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewHostRepositoryPostgres(db)
 
@@ -323,7 +323,7 @@ func TestHostRepositoryPostgres_List(t *testing.T) {
 func TestHostRepositoryPostgres_Update(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewHostRepositoryPostgres(db)
 
@@ -420,7 +420,7 @@ func TestHostRepositoryPostgres_Update(t *testing.T) {
 func TestHostRepositoryPostgres_Delete(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewHostRepositoryPostgres(db)
 
@@ -463,7 +463,7 @@ func TestHostRepositoryPostgres_Delete(t *testing.T) {
 func TestHostRepositoryPostgres_Count(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewHostRepositoryPostgres(db)
 

@@ -92,7 +92,7 @@ func (r *HostRepositoryPostgres) GetByIDs(ctx context.Context, ids []entities.Ho
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var hosts []*entities.Host
 	for rows.Next() {
@@ -123,7 +123,7 @@ func (r *HostRepositoryPostgres) List(ctx context.Context) ([]*entities.Host, er
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var hosts []*entities.Host
 	for rows.Next() {

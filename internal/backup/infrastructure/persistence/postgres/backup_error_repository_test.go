@@ -18,7 +18,7 @@ import (
 func TestBackupErrorRepositoryPostgres_Save(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewBackupErrorRepositoryPostgres(db)
 
@@ -72,7 +72,7 @@ func TestBackupErrorRepositoryPostgres_Save(t *testing.T) {
 func TestBackupErrorRepositoryPostgres_FindByBackupID(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewBackupErrorRepositoryPostgres(db)
 
@@ -188,7 +188,7 @@ func TestBackupErrorRepositoryPostgres_FindByBackupID(t *testing.T) {
 func TestBackupErrorRepositoryPostgres_DeleteByBackupID(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewBackupErrorRepositoryPostgres(db)
 

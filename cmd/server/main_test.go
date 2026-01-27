@@ -13,11 +13,11 @@ import (
 
 func setupTestServer() http.Handler {
 	// Set required environment variables for testing (use dev to get in-memory repos)
-	os.Setenv("ENVIRONMENT", "dev")
-	os.Setenv("JWT_SECRET", "test-secret-key")
-	os.Setenv("REDIS_HOST", "localhost")
-	os.Setenv("REDIS_PORT", "6379")
-	os.Setenv("ENCRYPTION_KEY", "test-encryption-key")
+	_ = os.Setenv("ENVIRONMENT", "dev")
+	_ = os.Setenv("JWT_SECRET", "test-secret-key")
+	_ = os.Setenv("REDIS_HOST", "localhost")
+	_ = os.Setenv("REDIS_PORT", "6379")
+	_ = os.Setenv("ENCRYPTION_KEY", "test-encryption-key")
 
 	// Initialize container to get the handler
 	container, err := container.InitializeContainer()
@@ -37,7 +37,7 @@ func TestHealthCheck(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not send GET request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("expected status OK; got %v", resp.Status)
@@ -63,7 +63,7 @@ func TestProtectedRoutes(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not send GET request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusUnauthorized {
 			t.Errorf("expected status Unauthorized; got %v", resp.Status)
@@ -75,7 +75,7 @@ func TestProtectedRoutes(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not send GET request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusUnauthorized {
 			t.Errorf("expected status Unauthorized; got %v", resp.Status)
@@ -98,7 +98,7 @@ func TestPublicRoutes(t *testing.T) {
 	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusBadRequest {
 		t.Fatalf("expected status Created or Bad Request from /setup; got %v", resp.Status)
 	}
-	resp.Body.Close()
+	_ = resp.Body.Close()
 
 	t.Run("it should allow login with correct credentials", func(t *testing.T) {
 		loginBody := `{"username": "testuser", "password": "password"}`
@@ -106,7 +106,7 @@ func TestPublicRoutes(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not send POST request to /login: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -120,7 +120,7 @@ func TestPublicRoutes(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not send POST request to /login: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusUnauthorized {
 			t.Errorf("expected status Unauthorized for login; got %v", resp.Status)
@@ -132,7 +132,7 @@ func TestPublicRoutes(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not send POST request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusUnauthorized {
 			t.Errorf("expected endpoint to return unauthorized for empty body, got %v", resp.Status)

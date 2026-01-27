@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -90,13 +91,21 @@ func EncryptFile(source string, target string, key []byte) error {
 	if err != nil {
 		return err
 	}
-	defer inFile.Close()
+	defer func() {
+		if err := inFile.Close(); err != nil {
+			log.Printf("WARNING: Failed to close input file %s: %v", source, err)
+		}
+	}()
 
 	outFile, err := os.Create(target)
 	if err != nil {
 		return err
 	}
-	defer outFile.Close()
+	defer func() {
+		if err := outFile.Close(); err != nil {
+			log.Printf("WARNING: Failed to close output file %s: %v", target, err)
+		}
+	}()
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -132,7 +141,11 @@ func DecryptFile(source string, target string, key []byte) error {
 	if err != nil {
 		return err
 	}
-	defer inFile.Close()
+	defer func() {
+		if err := inFile.Close(); err != nil {
+			log.Printf("WARNING: Failed to close input file %s: %v", source, err)
+		}
+	}()
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -167,13 +180,17 @@ func CompressDirectory(source string, target string) error {
 	if err != nil {
 		return err
 	}
-	defer tarFile.Close()
+	defer func() {
+		if err := tarFile.Close(); err != nil {
+			log.Printf("WARNING: Failed to close tar file %s: %v", target, err)
+		}
+	}()
 
 	gw := gzip.NewWriter(tarFile)
-	defer gw.Close()
+	defer func() { _ = gw.Close() }()
 
 	tw := tar.NewWriter(gw)
-	defer tw.Close()
+	defer func() { _ = tw.Close() }()
 
 	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -200,7 +217,7 @@ func CompressDirectory(source string, target string) error {
 			if err != nil {
 				return err
 			}
-			defer file.Close()
+			defer func() { _ = file.Close() }()
 			_, err = io.Copy(tw, file)
 			return err
 		}
@@ -213,13 +230,17 @@ func DecompressTarGz(source string, targetDir string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("WARNING: Failed to close file %s: %v", source, err)
+		}
+	}()
 
 	gzr, err := gzip.NewReader(file)
 	if err != nil {
 		return err
 	}
-	defer gzr.Close()
+	defer func() { _ = gzr.Close() }()
 
 	tr := tar.NewReader(gzr)
 
@@ -248,10 +269,10 @@ func DecompressTarGz(source string, targetDir string) error {
 				return err
 			}
 			if _, err := io.Copy(f, tr); err != nil {
-				f.Close()
+				_ = f.Close()
 				return err
 			}
-			f.Close()
+			_ = f.Close()
 		}
 	}
 	return nil

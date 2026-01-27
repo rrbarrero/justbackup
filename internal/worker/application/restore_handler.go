@@ -28,7 +28,11 @@ func HandleRestoreLocalTask(ctx context.Context, task workerDto.WorkerTask, redi
 		reportRestoreFailure(ctx, redisClient, resultQueue, task, "Failed to connect to CLI", err)
 		return
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			log.Printf("WARNING: Failed to close connection: %v", err)
+		}
+	}()
 
 	if err := authenticateConnection(conn, task.RestoreToken); err != nil {
 		log.Printf("Failed to send token: %v", err)
@@ -97,13 +101,17 @@ func streamEncryptedData(w io.Writer, task workerDto.WorkerTask) error {
 	if err := crypto.DecryptFile(task.Path, tempTarPath, key); err != nil {
 		return fmt.Errorf("decryption failed: %w", err)
 	}
-	defer os.Remove(tempTarPath)
+	defer func() {
+		if err := os.Remove(tempTarPath); err != nil {
+			log.Printf("WARNING: Failed to remove temp tar %s: %v", tempTarPath, err)
+		}
+	}()
 
 	file, err := os.Open(tempTarPath)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	_, err = io.Copy(w, file)
 	return err
@@ -111,10 +119,10 @@ func streamEncryptedData(w io.Writer, task workerDto.WorkerTask) error {
 
 func streamPlainData(w io.Writer, task workerDto.WorkerTask) error {
 	gw := gzip.NewWriter(w)
-	defer gw.Close()
+	defer func() { _ = gw.Close() }()
 
 	tw := tar.NewWriter(gw)
-	defer tw.Close()
+	defer func() { _ = tw.Close() }()
 
 	// Walk the directory and write to tar structure
 	return filepath.Walk(task.Path, func(path string, info os.FileInfo, err error) error {
@@ -143,7 +151,7 @@ func streamPlainData(w io.Writer, task workerDto.WorkerTask) error {
 			if err != nil {
 				return err
 			}
-			defer file.Close()
+			defer func() { _ = file.Close() }()
 			_, err = io.Copy(tw, file)
 			return err
 		}
@@ -177,20 +185,30 @@ func prepareRestoreSource(task workerDto.WorkerTask) (string, func(), error) {
 	// 2. Extract to temp dir
 	tempDir, err := os.MkdirTemp("", "restore-*")
 	if err != nil {
-		os.Remove(tempTarPath)
+		if rmErr := os.Remove(tempTarPath); rmErr != nil {
+			log.Printf("WARNING: Failed to remove temp tar %s: %v", tempTarPath, rmErr)
+		}
 		return "", nil, fmt.Errorf("temp dir creation failed: %w", err)
 	}
 
 	if err := crypto.DecompressTarGz(tempTarPath, tempDir); err != nil {
-		os.Remove(tempTarPath)
-		os.RemoveAll(tempDir)
+		if rmErr := os.Remove(tempTarPath); rmErr != nil {
+			log.Printf("WARNING: Failed to remove temp tar %s: %v", tempTarPath, rmErr)
+		}
+		if rmErr := os.RemoveAll(tempDir); rmErr != nil {
+			log.Printf("WARNING: Failed to remove temp dir %s: %v", tempDir, rmErr)
+		}
 		return "", nil, fmt.Errorf("decompression failed: %w", err)
 	}
 
 	// Cleanup closure
 	cleanup := func() {
-		os.Remove(tempTarPath)
-		os.RemoveAll(tempDir)
+		if err := os.Remove(tempTarPath); err != nil {
+			log.Printf("WARNING: Failed to remove temp tar %s: %v", tempTarPath, err)
+		}
+		if err := os.RemoveAll(tempDir); err != nil {
+			log.Printf("WARNING: Failed to remove temp dir %s: %v", tempDir, err)
+		}
 	}
 
 	// Return path with trailing slash for rsync content

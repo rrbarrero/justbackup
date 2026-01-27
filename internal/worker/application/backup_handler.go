@@ -128,7 +128,9 @@ func setupEphemeralWorkspace(task workerDto.WorkerTask) (string, string, func(),
 
 	cleanup := func() {
 		log.Printf("Cleaning up session temp dir: %s", tempDir)
-		os.RemoveAll(tempDir)
+		if err := os.RemoveAll(tempDir); err != nil {
+			log.Printf("WARNING: Failed to cleanup session temp dir %s: %v", tempDir, err)
+		}
 	}
 
 	// Here we MUST return the tempDir as the sourcePath because we want rsync
@@ -176,7 +178,9 @@ func executeRsyncOperation(task workerDto.WorkerTask, cfg *config.WorkerConfig, 
 	// Capture output for error reporting
 	output, err := cmd.CombinedOutput()
 	if len(output) > 0 {
-		os.Stdout.Write(output)
+		if _, err := os.Stdout.Write(output); err != nil {
+			log.Printf("Failed to write rsync output to stdout: %v", err)
+		}
 	}
 
 	if err != nil {
@@ -217,8 +221,12 @@ func performEncryptionWorkflow(task workerDto.WorkerTask, sourceDir string, cfg 
 	log.Printf("Backup encrypted successfully: %s", encPath)
 
 	// Clean up intermediate files
-	os.RemoveAll(sourceDir) // The original directory
-	os.Remove(tarPath)      // The unencrypted tarball
+	if err := os.RemoveAll(sourceDir); err != nil {
+		log.Printf("WARNING: Failed to remove source dir %s: %v", sourceDir, err)
+	}
+	if err := os.Remove(tarPath); err != nil {
+		log.Printf("WARNING: Failed to remove tarball %s: %v", tarPath, err)
+	}
 
 	// Update symlink if incremental
 	if task.Incremental {
@@ -232,7 +240,9 @@ func performEncryptionWorkflow(task workerDto.WorkerTask, sourceDir string, cfg 
 
 // Helper: updates the 'latest' symlink for incremental backups
 func updateLatestSymlink(linkPath, targetPath string) {
-	_ = os.Remove(linkPath)
+	if err := os.Remove(linkPath); err != nil && !os.IsNotExist(err) {
+		log.Printf("WARNING: Failed to remove old symlink %s: %v", linkPath, err)
+	}
 	if err := os.Symlink(filepath.Base(targetPath), linkPath); err != nil {
 		log.Printf("WARNING: Failed to update symlink %s -> %s: %v", linkPath, targetPath, err)
 	}

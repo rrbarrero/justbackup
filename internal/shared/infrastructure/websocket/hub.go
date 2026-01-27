@@ -44,7 +44,7 @@ func (h *Hub) Run() {
 			h.mu.Lock()
 			if _, ok := h.clients[conn]; ok {
 				delete(h.clients, conn)
-				conn.Close()
+				_ = conn.Close()
 				log.Println("WebSocket client disconnected")
 			}
 			h.mu.Unlock()
@@ -54,7 +54,7 @@ func (h *Hub) Run() {
 				// Write message to client
 				if _, err := conn.Write(message); err != nil {
 					log.Printf("Error writing to websocket: %v", err)
-					conn.Close()
+					_ = conn.Close()
 					delete(h.clients, conn)
 				}
 			}

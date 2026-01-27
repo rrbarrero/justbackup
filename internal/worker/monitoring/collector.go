@@ -134,7 +134,7 @@ func (c *StatsCollector) send(ctx context.Context, report WorkerStatsReportDTO) 
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusAccepted && resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("backend returned unexpected status: %s", resp.Status)

@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/rrbarrero/justbackup/internal/shared/infrastructure/auth"
@@ -60,7 +61,9 @@ func (h *UserHandler) GetSetupStatus(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	// Explicitly ignore the error as the connection might be closed
-	_ = json.NewEncoder(w).Encode(SetupStatusResponse{SetupRequired: required})
+	if err := json.NewEncoder(w).Encode(SetupStatusResponse{SetupRequired: required}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Initial setup
@@ -138,5 +141,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(LoginResponse{Token: token})
+	if err := json.NewEncoder(w).Encode(LoginResponse{Token: token}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

@@ -62,7 +62,7 @@ func FilesCommand() {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	fmt.Fprintln(w, "NAME\tTYPE\tSIZE")
+	_, _ = fmt.Fprintln(w, "NAME\tTYPE\tSIZE")
 	for _, f := range files {
 		fType := "FILE"
 		if f.IsDir {
@@ -74,9 +74,9 @@ func FilesCommand() {
 			sizeStr = "-"
 		}
 
-		fmt.Fprintf(w, "%s\t%s\t%s\n", f.Name, fType, sizeStr)
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\n", f.Name, fType, sizeStr)
 	}
-	w.Flush()
+	_ = w.Flush()
 }
 
 func formatSize(size int64) string {

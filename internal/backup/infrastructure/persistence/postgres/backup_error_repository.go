@@ -32,7 +32,7 @@ func (r *BackupErrorRepositoryPostgres) FindByBackupID(ctx context.Context, back
 	if err != nil {
 		return nil, fmt.Errorf("failed to query backup errors: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	errors := make([]*entities.BackupError, 0)
 	for rows.Next() {

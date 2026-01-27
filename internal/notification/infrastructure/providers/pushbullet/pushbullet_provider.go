@@ -79,7 +79,7 @@ func (p *PushbulletProvider) Send(ctx context.Context, title, message string, le
 	if err != nil {
 		return fmt.Errorf("failed to send request to pushbullet: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode >= 400 {
 		return fmt.Errorf("pushbullet returned error status: %d", resp.StatusCode)

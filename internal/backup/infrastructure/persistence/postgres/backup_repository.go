@@ -147,7 +147,7 @@ func (r *BackupRepositoryPostgres) loadHooks(ctx context.Context, backup *entiti
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var hooks []*entities.BackupHook
 	for rows.Next() {
@@ -198,7 +198,7 @@ func (r *BackupRepositoryPostgres) FindByHostID(ctx context.Context, hostID enti
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	backups, err := r.scanBackups(rows)
 	if err != nil {
@@ -221,7 +221,7 @@ func (r *BackupRepositoryPostgres) FindAll(ctx context.Context) ([]*entities.Bac
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	backups, err := r.scanBackups(rows)
 	if err != nil {
@@ -245,7 +245,7 @@ func (r *BackupRepositoryPostgres) FindDueBackups(ctx context.Context) ([]*entit
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	backups, err := r.scanBackups(rows)
 	if err != nil {
@@ -304,7 +304,7 @@ func (r *BackupRepositoryPostgres) GetStats(ctx context.Context) (*entities.Back
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var totalSize int64
 	for rows.Next() {
@@ -332,7 +332,7 @@ func (r *BackupRepositoryPostgres) GetFailedCountsByHost(ctx context.Context) (m
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	counts := make(map[string]int)
 	for rows.Next() {

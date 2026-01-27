@@ -78,7 +78,9 @@ func (h *BackupHandler) Run(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(map[string]string{"task_id": taskID})
+	if err := json.NewEncoder(w).Encode(map[string]string{"task_id": taskID}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Run all backups for a host
@@ -101,7 +103,9 @@ func (h *BackupHandler) RunHostBackups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(map[string][]string{"task_ids": taskIDs})
+	if err := json.NewEncoder(w).Encode(map[string][]string{"task_ids": taskIDs}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Delete a backup
@@ -158,7 +162,9 @@ func (h *BackupHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 
 }
 
@@ -197,7 +203,9 @@ func (h *BackupHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary List backups
@@ -222,7 +230,9 @@ func (h *BackupHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(backups)
+	if err := json.NewEncoder(w).Encode(backups); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Measure backup size
@@ -255,7 +265,9 @@ func (h *BackupHandler) MeasureSize(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(map[string]string{"task_id": taskID})
+	if err := json.NewEncoder(w).Encode(map[string]string{"task_id": taskID}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Get task result
@@ -308,7 +320,9 @@ func (h *BackupHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(backup)
+	if err := json.NewEncoder(w).Encode(backup); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Get backup errors
@@ -331,7 +345,9 @@ func (h *BackupHandler) GetErrors(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(errors)
+	if err := json.NewEncoder(w).Encode(errors); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Delete backup errors
@@ -380,7 +396,9 @@ func (h *BackupHandler) SearchFiles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(results)
+	if err := json.NewEncoder(w).Encode(results); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Restore files
@@ -441,7 +459,9 @@ func (h *BackupHandler) ListFiles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(files)
+	if err := json.NewEncoder(w).Encode(files); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 func (h *BackupHandler) CreateHook(w http.ResponseWriter, r *http.Request) {
@@ -460,7 +480,9 @@ func (h *BackupHandler) CreateHook(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 func (h *BackupHandler) UpdateHook(w http.ResponseWriter, r *http.Request) {

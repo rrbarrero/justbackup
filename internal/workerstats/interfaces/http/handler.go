@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/rrbarrero/justbackup/internal/workerstats/application"
@@ -66,7 +67,9 @@ func (h *WorkerStatsHandler) GetStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(stats)
+	if err := json.NewEncoder(w).Encode(stats); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // RegisterRoutes registers the stats routes

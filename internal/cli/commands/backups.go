@@ -55,13 +55,13 @@ func BackupsCommand(hostID string) {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	fmt.Fprintln(w, "ID\tHOST ID\tPATH\tDESTINATION\tSTATUS\tSCHEDULE\tLAST RUN")
+	_, _ = fmt.Fprintln(w, "ID\tHOST ID\tPATH\tDESTINATION\tSTATUS\tSCHEDULE\tLAST RUN")
 	for _, b := range backups {
 		lastRun := "Never"
 		if !b.LastRun.IsZero() {
 			lastRun = b.LastRun.Format(time.RFC3339)
 		}
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", b.ID, b.HostID, b.Path, b.Destination, b.Status, b.Schedule, lastRun)
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", b.ID, b.HostID, b.Path, b.Destination, b.Status, b.Schedule, lastRun)
 	}
-	w.Flush()
+	_ = w.Flush()
 }

@@ -51,14 +51,14 @@ func SearchCommand(pattern string) {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	fmt.Fprintln(w, "FILE PATH\tHOST\tDESTINATION\tID")
+	_, _ = fmt.Fprintln(w, "FILE PATH\tHOST\tDESTINATION\tID")
 	for _, res := range results {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
 			res.Path,
 			res.Backup.HostName,
 			res.Backup.Destination,
 			res.Backup.ID,
 		)
 	}
-	w.Flush()
+	_ = w.Flush()
 }

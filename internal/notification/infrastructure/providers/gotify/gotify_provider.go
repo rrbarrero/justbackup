@@ -86,7 +86,7 @@ func (p *GotifyProvider) Send(ctx context.Context, title, message string, level 
 	if err != nil {
 		return fmt.Errorf("failed to send request to gotify: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode >= 400 {
 		return fmt.Errorf("gotify returned error status: %d", resp.StatusCode)

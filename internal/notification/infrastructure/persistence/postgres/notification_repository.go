@@ -107,7 +107,7 @@ func (r *NotificationRepositoryPostgres) GetAllEnabledSettings(ctx context.Conte
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var settingsList []*entities.NotificationSettings
 	for rows.Next() {

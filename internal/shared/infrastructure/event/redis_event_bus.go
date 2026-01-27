@@ -38,7 +38,7 @@ func (b *RedisEventBus) Subscribe(ctx context.Context, eventName string, handler
 	pubsub := b.client.Subscribe(ctx, channel)
 
 	go func() {
-		defer pubsub.Close()
+		defer func() { _ = pubsub.Close() }()
 		ch := pubsub.Channel()
 
 		for {

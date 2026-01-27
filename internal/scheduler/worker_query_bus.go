@@ -25,7 +25,7 @@ func NewRedisWorkerQueryBus(client *redis.Client, publisher interfaces.TaskPubli
 
 func (b *RedisWorkerQueryBus) SearchFiles(ctx context.Context, pattern string) (workerDto.SearchFilesResult, error) {
 	pubsub := b.client.Subscribe(ctx, "worker_sync_responses")
-	defer pubsub.Close()
+	defer func() { _ = pubsub.Close() }()
 
 	if _, err := pubsub.ReceiveTimeout(ctx, 2*time.Second); err != nil {
 		return workerDto.SearchFilesResult{}, fmt.Errorf("failed to subscribe to worker responses: %w", err)
@@ -75,7 +75,7 @@ func (b *RedisWorkerQueryBus) SearchFiles(ctx context.Context, pattern string) (
 
 func (b *RedisWorkerQueryBus) ListFiles(ctx context.Context, path string) (workerDto.ListFilesResult, error) {
 	pubsub := b.client.Subscribe(ctx, "worker_sync_responses")
-	defer pubsub.Close()
+	defer func() { _ = pubsub.Close() }()
 
 	if _, err := pubsub.ReceiveTimeout(ctx, 2*time.Second); err != nil {
 		return workerDto.ListFilesResult{}, fmt.Errorf("failed to subscribe to worker responses: %w", err)

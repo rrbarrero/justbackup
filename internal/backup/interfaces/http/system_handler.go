@@ -40,7 +40,7 @@ func (h *SystemHandler) GetDiskUsage(w http.ResponseWriter, r *http.Request) {
 
 	// Subscribe to response channel
 	pubsub := h.redisClient.Subscribe(ctx, "worker_sync_responses")
-	defer pubsub.Close()
+	defer func() { _ = pubsub.Close() }()
 
 	// Wait for subscription to be confirmed (optional but recommended)
 	// ReceiveTimeout fits better to avoid blocking forever if redis is down
@@ -81,7 +81,9 @@ func (h *SystemHandler) GetDiskUsage(w http.ResponseWriter, r *http.Request) {
 
 			if result.TaskID == taskID {
 				w.Header().Set("Content-Type", "application/json")
-				_ = json.NewEncoder(w).Encode(result.Data)
+				if err := json.NewEncoder(w).Encode(result.Data); err != nil {
+					log.Printf("Failed to encode response: %v", err)
+				}
 				return
 			}
 		case <-timeout:

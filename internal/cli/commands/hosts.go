@@ -45,9 +45,9 @@ func HostsCommand() {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	fmt.Fprintln(w, "ID\tNAME\tHOST\tPORT\tUSER")
+	_, _ = fmt.Fprintln(w, "ID\tNAME\tHOST\tPORT\tUSER")
 	for _, h := range hosts {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\n", h.ID, h.Name, h.Host, h.Port, h.User)
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\n", h.ID, h.Name, h.Host, h.Port, h.User)
 	}
-	w.Flush()
+	_ = w.Flush()
 }

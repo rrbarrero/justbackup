@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/rrbarrero/justbackup/internal/backup/application"
@@ -53,7 +54,9 @@ func (h *HostHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary List hosts
@@ -74,8 +77,9 @@ func (h *HostHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(hosts)
+	if err := json.NewEncoder(w).Encode(hosts); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Get a host
@@ -98,7 +102,9 @@ func (h *HostHandler) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(host)
+	if err := json.NewEncoder(w).Encode(host); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // @Summary Update a host

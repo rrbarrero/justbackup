@@ -27,13 +27,13 @@ func (s *sshServiceImpl) InstallKey(host string, port int, user string, password
 	if err != nil {
 		return fmt.Errorf("failed to dial: %w", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	session, err := conn.NewSession()
 	if err != nil {
 		return fmt.Errorf("failed to create session: %w", err)
 	}
-	defer session.Close()
+	defer func() { _ = session.Close() }()
 
 	// Command to append key to authorized_keys, ensuring permissions are correct and restricting capabilities
 	// valid commands are: "rsync --server" (for backups) and "du -sk" (for size measurement)

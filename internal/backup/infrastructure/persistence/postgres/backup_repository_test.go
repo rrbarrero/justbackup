@@ -43,7 +43,7 @@ func (m *MockEncryptionService) Decrypt(data []byte) ([]byte, error) {
 func TestBackupRepositoryPostgres_Save_HookErrors(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	mockEnc := new(MockEncryptionService)
 	repo := postgres.NewBackupRepositoryPostgres(db, mockEnc)
@@ -97,7 +97,7 @@ func TestBackupRepositoryPostgres_Save_HookErrors(t *testing.T) {
 func TestBackupRepositoryPostgres_LoadHooks_Errors(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	mockEnc := new(MockEncryptionService)
 	repo := postgres.NewBackupRepositoryPostgres(db, mockEnc)
@@ -158,7 +158,7 @@ func TestBackupRepositoryPostgres_LoadHooks_Errors(t *testing.T) {
 func TestBackupRepositoryPostgres_Save_Success(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	mockEnc := new(MockEncryptionService)
 	repo := postgres.NewBackupRepositoryPostgres(db, mockEnc)
@@ -254,7 +254,7 @@ func TestBackupRepositoryPostgres_Save_Success(t *testing.T) {
 func TestBackupRepositoryPostgres_FindByID_Success(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	mockEnc := new(MockEncryptionService)
 	repo := postgres.NewBackupRepositoryPostgres(db, mockEnc)
@@ -314,7 +314,7 @@ func TestBackupRepositoryPostgres_FindByID_Success(t *testing.T) {
 func TestBackupRepositoryPostgres_Delete(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewBackupRepositoryPostgres(db, nil)
 	backupID := valueobjects.NewBackupID()
@@ -342,7 +342,7 @@ func TestBackupRepositoryPostgres_Delete(t *testing.T) {
 func TestBackupRepositoryPostgres_GetStats(t *testing.T) {
 	db, mockDB, err := sqlmock.New()
 	require.NoError(t, err)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := postgres.NewBackupRepositoryPostgres(db, nil)
 

@@ -54,7 +54,7 @@ func (r *MaintenanceRepositoryPostgres) FindAll(ctx context.Context) ([]*entitie
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var tasks []*entities.MaintenanceTask
 	for rows.Next() {
@@ -78,7 +78,7 @@ func (r *MaintenanceRepositoryPostgres) FindDueTasks(ctx context.Context) ([]*en
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var tasks []*entities.MaintenanceTask
 	for rows.Next() {

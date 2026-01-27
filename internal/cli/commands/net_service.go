@@ -55,12 +55,12 @@ func (s *netServiceImpl) AcceptAndValidate(listener io.Closer, token string) (io
 	receivedToken := make([]byte, len(token))
 	_, err = io.ReadFull(conn, receivedToken)
 	if err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, fmt.Errorf("error reading token: %w", err)
 	}
 
 	if string(receivedToken) != token {
-		conn.Close()
+		_ = conn.Close()
 		return nil, fmt.Errorf("invalid token received from worker")
 	}
 
@@ -72,7 +72,7 @@ func (s *netServiceImpl) ExtractTarGz(r io.Reader, dest string) error {
 	if err != nil {
 		return err
 	}
-	defer gzr.Close()
+	defer func() { _ = gzr.Close() }()
 
 	tr := tar.NewReader(gzr)
 
@@ -101,10 +101,10 @@ func (s *netServiceImpl) ExtractTarGz(r io.Reader, dest string) error {
 				return err
 			}
 			if _, err := io.Copy(f, tr); err != nil {
-				f.Close()
+				_ = f.Close()
 				return err
 			}
-			f.Close()
+			_ = f.Close()
 		}
 	}
 	return nil
