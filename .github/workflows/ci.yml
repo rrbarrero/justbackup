@@ -76,4 +76,7 @@ jobs:
           sed -i 's/ENCRYPTION_KEY=.*/ENCRYPTION_KEY=1234abcdefghi12341d2v2e31q3d5132/' .env
 
       - name: Run E2E Tests
-        run: make test-e2e
+        run: |
+          mkdir -p fixtures/destination fixtures/decrypted
+          chmod 777 fixtures/destination fixtures/decrypted
+          make test-e2e
