@@ -10,6 +10,10 @@ services:
       retries: 20
     environment:
       - BACKUP_ROOT=/mnt/backups
+  worker:
+    volumes:
+      - ./fixtures/destination:/mnt/backups
+
   e2e:
     image: mcr.microsoft.com/playwright:v1.57.0-jammy
     working_dir: /e2e
