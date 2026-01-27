@@ -59,7 +59,8 @@ func (h *UserHandler) GetSetupStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(SetupStatusResponse{SetupRequired: required})
+	// Explicitly ignore the error as the connection might be closed
+	_ = json.NewEncoder(w).Encode(SetupStatusResponse{SetupRequired: required})
 }
 
 // @Summary Initial setup
@@ -137,5 +138,5 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(LoginResponse{Token: token})
+	_ = json.NewEncoder(w).Encode(LoginResponse{Token: token})
 }

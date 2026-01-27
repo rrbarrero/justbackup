@@ -52,7 +52,7 @@ func (h *NotificationHandler) GetSettings(w http.ResponseWriter, r *http.Request
 	settings, err := h.service.GetSettings(r.Context(), userID, providerType)
 	if err == domain.ErrNotFound {
 		// Return empty default settings instead of 404 for better UX
-		json.NewEncoder(w).Encode(dto.NotificationSettingsResponse{
+		_ = json.NewEncoder(w).Encode(dto.NotificationSettingsResponse{
 			ProviderType: providerType,
 			Config:       make(map[string]interface{}),
 			Enabled:      false,
@@ -78,7 +78,7 @@ func (h *NotificationHandler) GetSettings(w http.ResponseWriter, r *http.Request
 		Enabled:      settings.Enabled,
 	}
 
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // @Summary Update notification settings
@@ -124,5 +124,5 @@ func (h *NotificationHandler) UpdateSettings(w http.ResponseWriter, r *http.Requ
 		Enabled:      settings.Enabled,
 	}
 
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }

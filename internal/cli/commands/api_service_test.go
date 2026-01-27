@@ -16,7 +16,7 @@ func TestAPIService_GetSSHKey(t *testing.T) {
 		if r.URL.Path != "/settings/ssh-key" {
 			t.Errorf("expected path /settings/ssh-key, got %s", r.URL.Path)
 		}
-		json.NewEncoder(w).Encode(map[string]string{"publicKey": "ssh-rsa aaa"})
+		_ = json.NewEncoder(w).Encode(map[string]string{"publicKey": "ssh-rsa aaa"})
 	}))
 	defer server.Close()
 
@@ -57,7 +57,7 @@ func TestAPIService_RequestRestore(t *testing.T) {
 		if r.Method != "POST" || r.URL.Path != "/backups/b1/restore" {
 			t.Errorf("expected POST /backups/b1/restore, got %s %s", r.Method, r.URL.Path)
 		}
-		json.NewEncoder(w).Encode(map[string]string{"task_id": "task-456"})
+		_ = json.NewEncoder(w).Encode(map[string]string{"task_id": "task-456"})
 	}))
 	defer server.Close()
 

@@ -21,7 +21,7 @@ func (c *Container) setupRouter(handlers *Handlers, services *Services, hub *web
 	// Basic health check
 	apiMux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
 	// Public Routes

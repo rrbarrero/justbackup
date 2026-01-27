@@ -78,7 +78,7 @@ func (h *BackupHandler) Run(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"task_id": taskID})
+	_ = json.NewEncoder(w).Encode(map[string]string{"task_id": taskID})
 }
 
 // @Summary Run all backups for a host
@@ -101,7 +101,7 @@ func (h *BackupHandler) RunHostBackups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string][]string{"task_ids": taskIDs})
+	_ = json.NewEncoder(w).Encode(map[string][]string{"task_ids": taskIDs})
 }
 
 // @Summary Delete a backup
@@ -158,7 +158,7 @@ func (h *BackupHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 
 }
 
@@ -197,7 +197,7 @@ func (h *BackupHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // @Summary List backups
@@ -222,7 +222,7 @@ func (h *BackupHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(backups)
+	_ = json.NewEncoder(w).Encode(backups)
 }
 
 // @Summary Measure backup size
@@ -255,7 +255,7 @@ func (h *BackupHandler) MeasureSize(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"task_id": taskID})
+	_ = json.NewEncoder(w).Encode(map[string]string{"task_id": taskID})
 }
 
 // @Summary Get task result
@@ -284,7 +284,7 @@ func (h *BackupHandler) GetTaskResult(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(result))
+	_, _ = w.Write([]byte(result))
 }
 
 // @Summary Get backup by ID
@@ -308,7 +308,7 @@ func (h *BackupHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(backup)
+	_ = json.NewEncoder(w).Encode(backup)
 }
 
 // @Summary Get backup errors
@@ -331,7 +331,7 @@ func (h *BackupHandler) GetErrors(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(errors)
+	_ = json.NewEncoder(w).Encode(errors)
 }
 
 // @Summary Delete backup errors
@@ -380,7 +380,7 @@ func (h *BackupHandler) SearchFiles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
+	_ = json.NewEncoder(w).Encode(results)
 }
 
 // @Summary Restore files
@@ -414,7 +414,7 @@ func (h *BackupHandler) Restore(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
-	json.NewEncoder(w).Encode(map[string]string{"task_id": taskID})
+	_ = json.NewEncoder(w).Encode(map[string]string{"task_id": taskID})
 }
 
 // @Summary List files in a backup
@@ -441,7 +441,7 @@ func (h *BackupHandler) ListFiles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(files)
+	_ = json.NewEncoder(w).Encode(files)
 }
 
 func (h *BackupHandler) CreateHook(w http.ResponseWriter, r *http.Request) {
@@ -460,7 +460,7 @@ func (h *BackupHandler) CreateHook(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 func (h *BackupHandler) UpdateHook(w http.ResponseWriter, r *http.Request) {
@@ -479,7 +479,7 @@ func (h *BackupHandler) UpdateHook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 func (h *BackupHandler) DeleteHook(w http.ResponseWriter, r *http.Request) {

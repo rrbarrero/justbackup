@@ -32,7 +32,7 @@ func ParseSize(sizeStr string) (int64, error) {
 	}
 
 	unit := strings.ToUpper(match[2])
-	var multiplier int64 = 1
+	var multiplier int64
 
 	switch unit {
 	case "B", "":

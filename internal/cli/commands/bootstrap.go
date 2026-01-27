@@ -23,7 +23,10 @@ func BootstrapCommand() {
 		fmt.Println("Usage: justbackup bootstrap --host <host> --name <name> [--user <user>] [--port <port>]")
 		os.Exit(1)
 	}
-	bootstrapCmd.Parse(os.Args[2:])
+	if err := bootstrapCmd.Parse(os.Args[2:]); err != nil {
+		fmt.Printf("Error parsing flags: %v\n", err)
+		os.Exit(1)
+	}
 
 	if *host == "" || *name == "" {
 		fmt.Println("Error: --host and --name are required.")

@@ -52,7 +52,7 @@ func (c *ResultConsumer) Start(ctx context.Context) {
 			redisResult, err := c.client.BLPop(ctx, 1*time.Second, c.queue).Result()
 			if err != nil {
 				if err != redis.Nil {
-					// log.Printf("Redis BLPop error: %v", err)
+					log.Printf("Redis BLPop error: %v", err)
 				}
 				continue
 			}
@@ -118,7 +118,9 @@ func (c *ResultConsumer) processBackupResult(ctx context.Context, result workerD
 	}
 
 	if result.Status == "completed" {
-		backup.Complete()
+		if err := backup.Complete(); err != nil {
+			log.Printf("Failed to complete backup %s: %v", backup.ID(), err)
+		}
 		size := ""
 		if dataMap, ok := result.Data.(map[string]interface{}); ok {
 			if s, ok := dataMap["size"].(string); ok {

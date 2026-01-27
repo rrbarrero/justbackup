@@ -145,16 +145,16 @@ func (b *Backup) Excludes() []string {
 	return result
 }
 
-func (b *Backup) Enable() {
+func (b *Backup) Enable() error {
 	b.enabled = true
 	b.updatedAt = NowFunc()
-	b.CalculateNextRun()
+	return b.CalculateNextRun()
 }
 
-func (b *Backup) Disable() {
+func (b *Backup) Disable() error {
 	b.enabled = false
 	b.updatedAt = NowFunc()
-	b.CalculateNextRun()
+	return b.CalculateNextRun()
 }
 
 func (b *Backup) CreatedAt() time.Time {
@@ -192,12 +192,11 @@ func (b *Backup) Start() error {
 	return nil
 }
 
-func (b *Backup) Complete() {
+func (b *Backup) Complete() error {
 	b.status = valueobjects.BackupStatusCompleted
 	b.updatedAt = NowFunc()        // Use NowFunc
 	b.schedule.LastRun = NowFunc() // Use NowFunc
-	b.CalculateNextRun()           // Recalculate next run
-	// Record event: BackupCompleted
+	return b.CalculateNextRun()    // Recalculate next run
 }
 
 func (b *Backup) Fail() {

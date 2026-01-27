@@ -62,7 +62,10 @@ func parseRestoreFlags() (*restoreOptions, error) {
 	}
 
 	opts.backupID = os.Args[2]
-	fs.Parse(os.Args[3:])
+	if err := fs.Parse(os.Args[3:]); err != nil {
+		fmt.Printf("Error parsing flags: %v\n", err)
+		os.Exit(1)
+	}
 
 	if opts.remotePath == "" {
 		fs.Usage()

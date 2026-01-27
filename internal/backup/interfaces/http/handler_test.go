@@ -134,7 +134,7 @@ func TestCreateBackup(t *testing.T) {
 
 	// Create a host first
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	reqBody := dto.CreateBackupRequest{
 		HostID:      host.ID().String(),
@@ -169,12 +169,13 @@ func TestListBackups(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	// Create a backup
 	schedule := entities.NewBackupSchedule("0 0 * * *")
 	backup, err := entities.NewBackup(host.ID(), "/source", "/dest", schedule, []string{}, false, 0, false)
-	backupRepo.Save(context.Background(), backup)
+	assert.NoError(t, err)
+	_ = backupRepo.Save(context.Background(), backup)
 
 	req, _ := http.NewRequest("GET", "/backups", nil)
 	rr := httptest.NewRecorder()
@@ -196,12 +197,13 @@ func TestUpdateBackup(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	// Create a backup
 	schedule := entities.NewBackupSchedule("0 0 * * *")
 	backup, err := entities.NewBackup(host.ID(), "/source", "/dest", schedule, []string{}, false, 0, false)
-	backupRepo.Save(context.Background(), backup)
+	assert.NoError(t, err)
+	_ = backupRepo.Save(context.Background(), backup)
 
 	// Update the backup
 	updateBody := dto.UpdateBackupRequest{
@@ -237,12 +239,13 @@ func TestDeleteBackup(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	// Create a backup
 	schedule := entities.NewBackupSchedule("0 0 * * *")
 	backup, err := entities.NewBackup(host.ID(), "/source", "/dest", schedule, []string{}, false, 0, false)
-	backupRepo.Save(context.Background(), backup)
+	assert.NoError(t, err)
+	_ = backupRepo.Save(context.Background(), backup)
 
 	// Delete the backup
 	req, _ := http.NewRequest("DELETE", "/backups/"+backup.ID().String(), nil)
@@ -263,12 +266,13 @@ func TestRunBackup(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	// Create a backup
 	schedule := entities.NewBackupSchedule("0 0 * * *")
 	backup, err := entities.NewBackup(host.ID(), "/source", "/dest", schedule, []string{}, false, 0, false)
-	backupRepo.Save(context.Background(), backup)
+	assert.NoError(t, err)
+	_ = backupRepo.Save(context.Background(), backup)
 
 	// Mock publisher
 	publisher.On("Publish", mock.Anything, mock.Anything).Return(nil)
@@ -296,7 +300,7 @@ func TestMeasureSize(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	// Mock publisher
 	expectedTaskID := "task-123"
@@ -347,14 +351,16 @@ func TestRunHostBackups(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	// Create two backups for this host
 	schedule := entities.NewBackupSchedule("0 0 * * *")
 	backup1, err := entities.NewBackup(host.ID(), "/source1", "/dest1", schedule, []string{}, false, 0, false)
+	assert.NoError(t, err)
 	backup2, err := entities.NewBackup(host.ID(), "/source2", "/dest2", schedule, []string{}, false, 0, false)
-	backupRepo.Save(context.Background(), backup1)
-	backupRepo.Save(context.Background(), backup2)
+	assert.NoError(t, err)
+	_ = backupRepo.Save(context.Background(), backup1)
+	_ = backupRepo.Save(context.Background(), backup2)
 
 	// Mock publisher
 	publisher.On("Publish", mock.Anything, mock.Anything).Return(nil)

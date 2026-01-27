@@ -64,7 +64,8 @@ func TestBackup(t *testing.T) {
 
 		backup, err := entities.NewBackup(entities.NewHostID(), "path", "dest", entities.NewBackupSchedule("0 0 * * *"), nil, false, 0, false)
 		assert.NoError(t, err)
-		backup.Start()
+		err = backup.Start()
+		assert.NoError(t, err)
 
 		// Attempt to start again
 		err = backup.Start()
@@ -80,12 +81,13 @@ func TestBackup(t *testing.T) {
 
 		backup, err := entities.NewBackup(entities.NewHostID(), "path", "dest", entities.NewBackupSchedule("0 0 * * *"), nil, false, 0, false)
 		assert.NoError(t, err)
-		backup.Start()
+		_ = backup.Start()
 
 		completeTime := time.Date(2023, time.January, 1, 12, 30, 0, 0, time.UTC)
 		entities.NowFunc = func() time.Time { return completeTime }
 
-		backup.Complete()
+		err = backup.Complete()
+		assert.NoError(t, err)
 
 		assert.Equal(t, valueobjects.BackupStatusCompleted, backup.Status())
 		assert.Equal(t, completeTime, backup.UpdatedAt())
@@ -97,7 +99,7 @@ func TestBackup(t *testing.T) {
 
 		backup, err := entities.NewBackup(entities.NewHostID(), "path", "dest", entities.NewBackupSchedule("0 0 * * *"), nil, false, 0, false)
 		assert.NoError(t, err)
-		backup.Start()
+		_ = backup.Start()
 
 		failTime := time.Date(2023, time.January, 1, 12, 15, 0, 0, time.UTC)
 		entities.NowFunc = func() time.Time { return failTime }
@@ -120,7 +122,8 @@ func TestBackup(t *testing.T) {
 		// Disable
 		disableTime := fixedTime.Add(1 * time.Minute)
 		entities.NowFunc = func() time.Time { return disableTime }
-		backup.Disable()
+		err = backup.Disable()
+		assert.NoError(t, err)
 
 		assert.False(t, backup.Enabled())
 		assert.Equal(t, disableTime, backup.UpdatedAt())
@@ -129,7 +132,8 @@ func TestBackup(t *testing.T) {
 		// Enable
 		enableTime := fixedTime.Add(2 * time.Minute)
 		entities.NowFunc = func() time.Time { return enableTime }
-		backup.Enable()
+		err = backup.Enable()
+		assert.NoError(t, err)
 
 		assert.True(t, backup.Enabled())
 		assert.Equal(t, enableTime, backup.UpdatedAt())

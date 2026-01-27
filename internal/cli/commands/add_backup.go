@@ -27,7 +27,10 @@ func AddBackupCommand() {
 		os.Exit(1)
 	}
 
-	addCmd.Parse(os.Args[2:])
+	if err := addCmd.Parse(os.Args[2:]); err != nil {
+		fmt.Printf("Error parsing flags: %v\n", err)
+		os.Exit(1)
+	}
 
 	if *hostID == "" || *path == "" || *destination == "" {
 		fmt.Println("Error: --host-id, --path, and --dest are required.")

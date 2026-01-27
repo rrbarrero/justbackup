@@ -60,7 +60,7 @@ func TestHostHandler_List(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	req, _ := http.NewRequest("GET", "/hosts", nil)
 	rr := httptest.NewRecorder()
@@ -81,7 +81,7 @@ func TestHostHandler_Get(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	req, _ := http.NewRequest("GET", "/hosts/"+host.ID().String(), nil)
 	req.SetPathValue("id", host.ID().String())
@@ -103,7 +103,7 @@ func TestHostHandler_Update(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	// Update it
 	updateBody := dto.UpdateHostRequest{
@@ -141,7 +141,7 @@ func TestHostHandler_Delete(t *testing.T) {
 
 	// Create a host
 	host := entities.NewHost("Test Host", "test.example.com", "user", 22, "path", false)
-	hostRepo.Save(context.Background(), host)
+	_ = hostRepo.Save(context.Background(), host)
 
 	// Delete it
 	req, _ := http.NewRequest("DELETE", "/hosts/"+host.ID().String(), nil)

@@ -27,7 +27,10 @@ func FilesCommand() {
 	}
 
 	backupID := os.Args[2]
-	filesCmd.Parse(os.Args[3:])
+	if err := filesCmd.Parse(os.Args[3:]); err != nil {
+		fmt.Printf("Error parsing flags: %v\n", err)
+		os.Exit(1)
+	}
 
 	cfg, err := config.LoadConfig()
 	if err != nil {

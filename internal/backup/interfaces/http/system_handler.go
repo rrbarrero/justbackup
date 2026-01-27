@@ -81,7 +81,7 @@ func (h *SystemHandler) GetDiskUsage(w http.ResponseWriter, r *http.Request) {
 
 			if result.TaskID == taskID {
 				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(result.Data)
+				_ = json.NewEncoder(w).Encode(result.Data)
 				return
 			}
 		case <-timeout:

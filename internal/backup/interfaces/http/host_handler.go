@@ -53,7 +53,7 @@ func (h *HostHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // @Summary List hosts
@@ -75,7 +75,7 @@ func (h *HostHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(hosts)
+	_ = json.NewEncoder(w).Encode(hosts)
 }
 
 // @Summary Get a host
@@ -98,7 +98,7 @@ func (h *HostHandler) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(host)
+	_ = json.NewEncoder(w).Encode(host)
 }
 
 // @Summary Update a host
@@ -130,7 +130,7 @@ func (h *HostHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // @Summary Delete a host

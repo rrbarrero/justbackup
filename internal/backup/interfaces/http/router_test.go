@@ -49,10 +49,10 @@ func TestRestoreRoute(t *testing.T) {
 
 	// Create host and backup
 	host := entities.NewHost("Test Host", "localhost", "user", 22, "path", false)
-	hostRepo.Save(context.TODO(), host)
+	_ = hostRepo.Save(context.TODO(), host)
 	backup, err := entities.NewBackup(host.ID(), "/src", "/dest", entities.NewBackupSchedule("0 0 * * *"), []string{}, false, 0, false)
 	assert.NoError(t, err)
-	backupRepo.Save(context.TODO(), backup)
+	_ = backupRepo.Save(context.TODO(), backup)
 
 	reqBody := dto.RestoreRequest{
 		Path:         "/some/path",

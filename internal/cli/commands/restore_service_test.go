@@ -105,7 +105,7 @@ func TestRestoreService_ExecuteLocal_CustomAddr(t *testing.T) {
 		CustomAddr: "192.168.1.50",
 	}
 
-	svc.ExecuteLocal(params)
+	_ = svc.ExecuteLocal(params)
 	if capturedAddr != "192.168.1.50:9999" {
 		t.Errorf("expected 192.168.1.50:9999, got %s", capturedAddr)
 	}

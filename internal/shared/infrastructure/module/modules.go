@@ -182,8 +182,6 @@ func (m *EventBusModule) Stop() error {
 // SchedulerModule manages the backup scheduler
 type SchedulerModule struct {
 	config          *config.ServerConfig
-	redisMod        *RedisModule
-	eventBus        *event.RedisEventBus
 	backupScheduler *scheduler.Scheduler
 	resultConsumer  *scheduler.ResultConsumer
 	ctx             context.Context

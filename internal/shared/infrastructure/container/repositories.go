@@ -47,6 +47,9 @@ func (c *Container) initializeRepositories(cfg *config.ServerConfig, env string)
 			}
 			conn, err := db.NewPostgresConnection(dbConfig)
 			if err == nil {
+				// Run Migrations for notifications if using Postgres in dev
+				_ = db.RunMigrations(dbConfig, "migrations")
+
 				encryptionService, err := crypto.NewAESGCMEncryptionService(cfg.EncryptionKey)
 				if err != nil {
 					log.Printf("Failed to create encryption service in dev: %v", err)

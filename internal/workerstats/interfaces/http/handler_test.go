@@ -46,7 +46,8 @@ func TestWorkerStatsHandler_GetStats(t *testing.T) {
 	handler := NewWorkerStatsHandler(service)
 
 	// Pre-seed some data
-	repo.SaveReport(context.Background(), "worker-1", entities.WorkerStatsReport{CPUUsage: 5.0})
+	err := repo.SaveReport(context.Background(), "worker-1", entities.WorkerStatsReport{CPUUsage: 5.0})
+	assert.NoError(t, err)
 
 	req, _ := http.NewRequest("GET", "/workers/stats", nil)
 	rr := httptest.NewRecorder()
@@ -56,7 +57,8 @@ func TestWorkerStatsHandler_GetStats(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 
 	var result []*entities.WorkerStatsWindow
-	json.NewDecoder(rr.Body).Decode(&result)
+	err = json.NewDecoder(rr.Body).Decode(&result)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, "worker-1", result[0].WorkerID)
 }

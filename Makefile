@@ -2,7 +2,7 @@
 -include .env
 export
 
-.PHONY: build-server build-client server-test frontend-validate secrets deploy install up
+.PHONY: build-server build-client server-test frontend-validate lint secrets deploy install up
 
 build-server:
 	go build -o server cmd/server/main.go
@@ -20,6 +20,9 @@ server-test:
 frontend-validate:
 	npm run validate --prefix web/
 
+lint:
+	golangci-lint run
+
 format:
 	go fmt ./...
 	npm run format --prefix web/
@@ -27,7 +30,7 @@ format:
 swagger:
 	swag init -g cmd/server/main.go
 
-check: format swagger server-test frontend-validate
+check: format swagger lint server-test frontend-validate
 
 install:
 	@if [ ! -f .env ]; then \

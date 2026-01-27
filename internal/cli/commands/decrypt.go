@@ -21,7 +21,10 @@ func DecryptCommand() {
 		os.Exit(1)
 	}
 
-	decryptCmd.Parse(os.Args[2:])
+	if err := decryptCmd.Parse(os.Args[2:]); err != nil {
+		fmt.Printf("Error parsing flags: %v\n", err)
+		os.Exit(1)
+	}
 
 	if *filePtr == "" || *outPtr == "" || *idPtr == "" || *keyPtr == "" {
 		fmt.Println("Missing required flags")
