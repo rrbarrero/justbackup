@@ -54,3 +54,26 @@ jobs:
 
       - name: Validate Frontend
         run: make frontend-validate
+
+  e2e:
+    name: E2E Tests
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Create secrets and environment
+        run: |
+          make secrets
+          cp env.example .env
+          # Ensure a consistent encryption key for tests
+          sed -i 's/ENCRYPTION_KEY=.*/ENCRYPTION_KEY=1234abcdefghi12341d2v2e31q3d5132/' .env
+
+      - name: Run E2E Tests
+        run: make test-e2e
