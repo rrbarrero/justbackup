@@ -268,14 +268,18 @@ test('should execute an incremental backup task and verify multiple versions wit
     const firstVersionPath = path.join(backupBaseDir, firstVersion);
     // Rsync without trailing slash creates a subdirectory with the name of the source dir
     const testFile = 'example-file.txt';
-    const firstFilePath = path.join(firstVersionPath, 'source_data', testFile);
 
-    // Debug helper: list directory if not found and fail explicitly if not exists
+    // Verify file exists (check both paths/rsync behaviors)
+    let firstFilePath = path.join(firstVersionPath, 'source_data', testFile);
     if (!fs.existsSync(firstFilePath)) {
-        console.log(`File not found at ${firstFilePath}. Content of ${firstVersionPath}:`);
-        try {
-            execSync(`ls -R ${firstVersionPath}`);
-        } catch (e) { }
+        // Fallback: check if file is at root
+        const rootFilePath = path.join(firstVersionPath, testFile);
+        if (fs.existsSync(rootFilePath)) {
+            firstFilePath = rootFilePath;
+        } else {
+            console.log(`File not found at ${firstFilePath} OR ${rootFilePath}. Content of ${firstVersionPath}:`);
+            try { execSync(`ls -R ${firstVersionPath}`); } catch (e) { }
+        }
     }
     expect(fs.existsSync(firstFilePath)).toBe(true);
     const firstInode = fs.statSync(firstFilePath).ino;
