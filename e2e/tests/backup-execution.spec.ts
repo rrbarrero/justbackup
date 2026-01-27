@@ -89,15 +89,16 @@ test('should execute a backup task and verify files on disk', async ({ page, req
     const files = fs.readdirSync(verifyPath);
     console.log('Backup files found:', files);
 
-    let contents = files;
-    // If rsync created a directory, verify valid content inside
-    if (files.includes('source_data')) {
+    let hasExampleFile = files.includes('example-file.txt');
+
+    // If not in root, check inside source_data subdirectory (common rsync behavior)
+    if (!hasExampleFile && files.includes('source_data')) {
         const subPath = path.join(verifyPath, 'source_data');
-        contents = fs.readdirSync(subPath);
-        console.log('Backup subfiles found:', contents);
+        const subFiles = fs.readdirSync(subPath);
+        console.log('Backup subfiles found:', subFiles);
+        hasExampleFile = subFiles.includes('example-file.txt');
     }
 
-    const hasExampleFile = contents.includes('example-file.txt');
     expect(hasExampleFile).toBe(true);
 });
 
