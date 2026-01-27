@@ -1,0 +1,1389 @@
+basePath: /api/v1
+definitions:
+  application.DashboardStats:
+    properties:
+      active_workers:
+        type: integer
+      backup_stats:
+        $ref: '#/definitions/entities.BackupStats'
+      total_backups:
+        type: integer
+      total_hosts:
+        type: integer
+    type: object
+  application.WorkerStatsReportDTO:
+    properties:
+      cpu_usage:
+        type: number
+      disk_percent:
+        type: number
+      disk_total:
+        type: integer
+      disk_used:
+        type: integer
+      memory_percent:
+        type: number
+      memory_total:
+        type: integer
+      memory_used:
+        type: integer
+      timestamp:
+        type: string
+      worker_id:
+        type: string
+    type: object
+  dto.BackupErrorResponse:
+    properties:
+      backup_id:
+        type: string
+      error_message:
+        type: string
+      id:
+        type: string
+      job_id:
+        type: string
+      occurred_at:
+        type: string
+    type: object
+  dto.BackupFileResponse:
+    properties:
+      is_dir:
+        type: boolean
+      name:
+        type: string
+      size:
+        type: integer
+    type: object
+  dto.BackupResponse:
+    properties:
+      destination:
+        type: string
+      encrypted:
+        type: boolean
+      excludes:
+        items:
+          type: string
+        type: array
+      hooks:
+        items:
+          $ref: '#/definitions/dto.HookDTO'
+        type: array
+      host_address:
+        type: string
+      host_id:
+        type: string
+      host_name:
+        type: string
+      id:
+        type: string
+      incremental:
+        type: boolean
+      last_run:
+        type: string
+      path:
+        type: string
+      retention:
+        type: integer
+      schedule:
+        type: string
+      size:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.CreateBackupRequest:
+    properties:
+      destination:
+        type: string
+      encrypted:
+        type: boolean
+      excludes:
+        items:
+          type: string
+        type: array
+      hooks:
+        items:
+          $ref: '#/definitions/dto.CreateHookRequest'
+        type: array
+      host_id:
+        type: string
+      incremental:
+        type: boolean
+      path:
+        type: string
+      retention:
+        type: integer
+      schedule:
+        description: Cron expression
+        type: string
+    type: object
+  dto.CreateHookRequest:
+    properties:
+      enabled:
+        type: boolean
+      name:
+        type: string
+      params:
+        additionalProperties:
+          type: string
+        type: object
+      phase:
+        description: '"pre" or "post"'
+        type: string
+    required:
+    - name
+    - phase
+    type: object
+  dto.CreateHostRequest:
+    properties:
+      hostname:
+        type: string
+      is_workstation:
+        type: boolean
+      name:
+        type: string
+      path:
+        type: string
+      port:
+        type: integer
+      user:
+        type: string
+    type: object
+  dto.FileSearchResult:
+    properties:
+      backup:
+        $ref: '#/definitions/dto.BackupResponse'
+      path:
+        type: string
+    type: object
+  dto.HookDTO:
+    properties:
+      enabled:
+        type: boolean
+      id:
+        type: string
+      name:
+        type: string
+      params:
+        additionalProperties:
+          type: string
+        type: object
+      phase:
+        type: string
+    type: object
+  dto.HostResponse:
+    properties:
+      failed_backups_count:
+        type: integer
+      hostname:
+        type: string
+      id:
+        type: string
+      is_workstation:
+        type: boolean
+      name:
+        type: string
+      path:
+        type: string
+      port:
+        type: integer
+      user:
+        type: string
+    type: object
+  dto.NotificationSettingsResponse:
+    properties:
+      config:
+        additionalProperties: true
+        type: object
+      enabled:
+        type: boolean
+      provider_type:
+        type: string
+    type: object
+  dto.RestoreRequest:
+    properties:
+      backup_id:
+        type: string
+      path:
+        description: Path inside the backup
+        type: string
+      restore_addr:
+        description: 'For local: CLI address'
+        type: string
+      restore_token:
+        description: 'For local: Auth token'
+        type: string
+      restore_type:
+        description: '"local" or "remote"'
+        type: string
+      target_host_id:
+        type: string
+      target_path:
+        type: string
+    type: object
+  dto.TokenResponse:
+    properties:
+      created_at:
+        type: string
+      exists:
+        type: boolean
+      token:
+        description: Only present when generated
+        type: string
+    type: object
+  dto.UpdateBackupRequest:
+    properties:
+      destination:
+        type: string
+      encrypted:
+        type: boolean
+      excludes:
+        items:
+          type: string
+        type: array
+      hooks:
+        items:
+          $ref: '#/definitions/dto.CreateHookRequest'
+        type: array
+      id:
+        type: string
+      incremental:
+        type: boolean
+      path:
+        type: string
+      retention:
+        type: integer
+      schedule:
+        type: string
+    type: object
+  dto.UpdateHostRequest:
+    properties:
+      hostname:
+        type: string
+      id:
+        type: string
+      is_workstation:
+        type: boolean
+      name:
+        type: string
+      path:
+        type: string
+      port:
+        type: integer
+      user:
+        type: string
+    type: object
+  dto.UpdateNotificationSettingsRequest:
+    properties:
+      config:
+        additionalProperties: true
+        type: object
+      enabled:
+        type: boolean
+      provider_type:
+        type: string
+    type: object
+  entities.BackupStats:
+    properties:
+      completed:
+        type: integer
+      failed:
+        type: integer
+      pending:
+        type: integer
+      total:
+        type: integer
+      total_size:
+        type: string
+    type: object
+  entities.WorkerStatsReport:
+    properties:
+      cpu_usage:
+        type: number
+      disk_percent:
+        type: number
+      disk_total:
+        type: integer
+      disk_used:
+        type: integer
+      memory_percent:
+        type: number
+      memory_total:
+        type: integer
+      memory_used:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  entities.WorkerStatsWindow:
+    properties:
+      reports:
+        items:
+          $ref: '#/definitions/entities.WorkerStatsReport'
+        type: array
+      worker_id:
+        type: string
+    type: object
+  http.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  http.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  http.SeedErrorRequest:
+    properties:
+      backup_id:
+        type: string
+      error_message:
+        type: string
+      job_id:
+        type: string
+      occurred_at:
+        type: string
+    type: object
+  http.SetupRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  http.SetupStatusResponse:
+    properties:
+      setupRequired:
+        type: boolean
+    type: object
+info:
+  contact: {}
+  description: API for JustBackup application
+  title: JustBackup API
+  version: "1.0"
+paths:
+  /api/v1/test/backup-errors/seed:
+    post:
+      consumes:
+      - application/json
+      description: Add predefined backup errors for E2E testing (test mode only)
+      parameters:
+      - description: List of errors to seed
+        in: body
+        name: errors
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/http.SeedErrorRequest'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Seed test backup errors
+      tags:
+      - test
+  /backups:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of backups, optionally filtered by host_id and status
+      parameters:
+      - description: Host ID
+        in: query
+        name: host_id
+        type: string
+      - description: Backup Status (pending, running, completed, failed)
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.BackupResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: List backups
+      tags:
+      - backups
+    post:
+      consumes:
+      - application/json
+      description: Create a new backup configuration
+      parameters:
+      - description: Backup Configuration
+        in: body
+        name: backup
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateBackupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.BackupResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Create a backup
+      tags:
+      - backups
+  /backups/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a backup configuration
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Delete a backup
+      tags:
+      - backups
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific backup
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.BackupResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Backup not found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get backup by ID
+      tags:
+      - backups
+    put:
+      consumes:
+      - application/json
+      description: Update an existing backup configuration
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Backup Configuration
+        in: body
+        name: backup
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateBackupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.BackupResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Update a backup
+      tags:
+      - backups
+  /backups/{id}/errors:
+    delete:
+      consumes:
+      - application/json
+      description: Delete all error logs for a specific backup
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Delete backup errors
+      tags:
+      - backups
+    get:
+      consumes:
+      - application/json
+      description: Get all error logs for a specific backup
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.BackupErrorResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get backup errors
+      tags:
+      - backups
+  /backups/{id}/files:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of files and directories for a specific backup
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Subpath to list
+        in: query
+        name: path
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.BackupFileResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Backup not found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: List files in a backup
+      tags:
+      - backups
+  /backups/{id}/restore:
+    post:
+      consumes:
+      - application/json
+      description: Trigger a restoration process
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Restore Configuration
+        in: body
+        name: restore
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RestoreRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Restore files
+      tags:
+      - backups
+  /backups/{id}/run:
+    post:
+      consumes:
+      - application/json
+      description: Trigger a backup execution immediately
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Run a backup
+      tags:
+      - backups
+  /dashboard/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for the dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/application.DashboardStats'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get dashboard statistics
+      tags:
+      - dashboard
+  /files/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for files in all backups using a POSIX pattern
+      parameters:
+      - description: POSIX pattern (e.g. *.txt)
+        in: query
+        name: pattern
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.FileSearchResult'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Search files in backups
+      tags:
+      - backups
+  /hosts:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all hosts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.HostResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: List hosts
+      tags:
+      - hosts
+    post:
+      consumes:
+      - application/json
+      description: Create a new host configuration
+      parameters:
+      - description: Host Configuration
+        in: body
+        name: host
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateHostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.HostResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Create a host
+      tags:
+      - hosts
+  /hosts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a host configuration
+      parameters:
+      - description: Host ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Delete a host
+      tags:
+      - hosts
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific host
+      parameters:
+      - description: Host ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HostResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Host not found
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get a host
+      tags:
+      - hosts
+    put:
+      consumes:
+      - application/json
+      description: Update an existing host configuration
+      parameters:
+      - description: Host ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Host Configuration
+        in: body
+        name: host
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateHostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HostResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Update a host
+      tags:
+      - hosts
+  /hosts/{id}/measure:
+    post:
+      consumes:
+      - application/json
+      description: Measure the size of a directory on a host
+      parameters:
+      - description: Host ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Path to measure (key: path)'
+        in: body
+        name: path
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Measure backup size
+      tags:
+      - hosts
+  /hosts/{id}/run:
+    post:
+      consumes:
+      - application/json
+      description: Trigger all backup executions for a specific host immediately
+      parameters:
+      - description: Host ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Run all backups for a host
+      tags:
+      - hosts
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and get JWT token
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/http.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.LoginResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login
+      tags:
+      - user
+  /settings/notifications:
+    get:
+      consumes:
+      - application/json
+      description: Get notification settings for the current user
+      parameters:
+      - description: Provider Type (e.g. gotify)
+        in: query
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.NotificationSettingsResponse'
+        "404":
+          description: Settings not found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get notification settings
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      description: Update notification settings for the current user
+      parameters:
+      - description: Notification Settings
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateNotificationSettingsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.NotificationSettingsResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update notification settings
+      tags:
+      - settings
+  /settings/ssh-key:
+    get:
+      consumes:
+      - application/json
+      description: Get the SSH public key for the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get SSH Public Key
+      tags:
+      - settings
+  /settings/token:
+    delete:
+      consumes:
+      - application/json
+      description: Revoke the current API token
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Revoke API Token
+      tags:
+      - auth
+    get:
+      consumes:
+      - application/json
+      description: Get the status of the current API token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TokenResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get API Token Status
+      tags:
+      - auth
+    post:
+      consumes:
+      - application/json
+      description: Generate a new API token for CLI access
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TokenResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Generate API Token
+      tags:
+      - auth
+  /setup:
+    post:
+      consumes:
+      - application/json
+      description: Register the initial user
+      parameters:
+      - description: Setup Credentials
+        in: body
+        name: setup
+        required: true
+        schema:
+          $ref: '#/definitions/http.SetupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      summary: Initial setup
+      tags:
+      - user
+  /setup-status:
+    get:
+      consumes:
+      - application/json
+      description: Check if the initial setup is required
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SetupStatusResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get setup status
+      tags:
+      - user
+  /system/disk-usage:
+    get:
+      consumes:
+      - application/json
+      description: Get disk usage statistics for the backup partition
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get disk usage
+      tags:
+      - system
+  /tasks/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the result of a background task
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task Result
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Result not found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get task result
+      tags:
+      - tasks
+  /workers/stats:
+    get:
+      description: Get rolling window stats for all workers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.WorkerStatsWindow'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get all worker statistics
+      tags:
+      - workerstats
+    post:
+      consumes:
+      - application/json
+      description: Receive CPU, memory, and disk usage from a worker
+      parameters:
+      - description: Worker Stats Report
+        in: body
+        name: stats
+        required: true
+        schema:
+          $ref: '#/definitions/application.WorkerStatsReportDTO'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Post worker statistics
+      tags:
+      - workerstats
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
