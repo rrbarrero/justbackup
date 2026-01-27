@@ -29,7 +29,7 @@ services:
         condition: service_healthy
       ssh-source:
         condition: service_started
-    command: sh -c "npx playwright test $${TEST}"
+    command: sh -c "npm ci && npx playwright test $${TEST}"
     ipc: host
 
   ssh-source:
