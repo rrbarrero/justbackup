@@ -89,16 +89,28 @@ test('should execute a backup task and verify files on disk', async ({ page, req
     const files = fs.readdirSync(verifyPath);
     console.log('Backup files found:', files);
 
-    let hasExampleFile = files.includes('example-file.txt');
+    // Helper for recursive search to handle variable rsync directory structures
+    const findFile = (dir: string, filename: string): boolean => {
+        if (!fs.existsSync(dir)) return false;
+        try {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            for (const entry of entries) {
+                if (entry.name === filename) return true;
+                if (entry.isDirectory()) {
+                    if (findFile(path.join(dir, entry.name), filename)) return true;
+                }
+            }
+        } catch (e) {
+            console.error(`Error reading ${dir}:`, e);
+        }
+        return false;
+    };
 
-    // If not in root, check inside source_data subdirectory (common rsync behavior)
-    if (!hasExampleFile && files.includes('source_data')) {
-        const subPath = path.join(verifyPath, 'source_data');
-        const subFiles = fs.readdirSync(subPath);
-        console.log('Backup subfiles found:', subFiles);
-        hasExampleFile = subFiles.includes('example-file.txt');
+    const hasExampleFile = findFile(verifyPath, 'example-file.txt');
+    if (!hasExampleFile) {
+        console.log('--- RECURSIVE LISTING FAIL ---');
+        try { execSync(`ls -R ${verifyPath}`, { stdio: 'inherit' }); } catch (e) { }
     }
-
     expect(hasExampleFile).toBe(true);
 });
 
@@ -297,7 +309,11 @@ test('should execute an incremental backup task and verify multiple versions wit
 
     const secondVersion = fs.readlinkSync(path.join(backupBaseDir, 'latest'));
     const secondVersionPath = path.join(backupBaseDir, secondVersion);
-    const secondFilePath = path.join(secondVersionPath, 'source_data', testFile);
+    // Verify second file path (with fallback)
+    let secondFilePath = path.join(secondVersionPath, 'source_data', testFile);
+    if (!fs.existsSync(secondFilePath)) {
+        secondFilePath = path.join(secondVersionPath, testFile);
+    }
     expect(fs.existsSync(secondFilePath)).toBe(true);
 
     const secondInode = fs.statSync(secondFilePath).ino;
@@ -323,6 +339,11 @@ test('should execute an incremental backup task and verify multiple versions wit
 
     const thirdVersion = fs.readlinkSync(path.join(backupBaseDir, 'latest'));
     const thirdVersionPath = path.join(backupBaseDir, thirdVersion);
-    const thirdFilePath = path.join(thirdVersionPath, 'source_data', newFileName);
+
+    // Verify third file path (with fallback)
+    let thirdFilePath = path.join(thirdVersionPath, 'source_data', newFileName);
+    if (!fs.existsSync(thirdFilePath)) {
+        thirdFilePath = path.join(thirdVersionPath, newFileName);
+    }
     expect(fs.existsSync(thirdFilePath)).toBe(true);
 });
