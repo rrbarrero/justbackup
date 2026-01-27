@@ -78,7 +78,7 @@ up: swagger
 test-e2e:
 	@mkdir -p fixtures/destination fixtures/decrypted
 	@chmod 777 fixtures/destination fixtures/decrypted || true
-	TEST="$(TEST)" ENVIRONMENT=dev docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --build --exit-code-from e2e && jq '.status' e2e/test-results/.last-run.json
+	TEST="$(TEST)" WORKER_UID=$(shell id -u) WORKER_GID=$(shell id -g) ENVIRONMENT=dev docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --build --exit-code-from e2e && jq '.status' e2e/test-results/.last-run.json
 	@echo "Cleaning up fixtures..."
 	@docker run --rm -v $(PWD)/fixtures/destination:/mnt/dest -v $(PWD)/fixtures/decrypted:/mnt/decrypted alpine sh -c "rm -rf /mnt/dest/* /mnt/decrypted/* && chmod 777 /mnt/dest /mnt/decrypted || true"
 
