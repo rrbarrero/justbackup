@@ -1,0 +1,45 @@
+services:
+  web:
+    build:
+      args:
+        NEXT_PUBLIC_WS_URL: ws://server:8080/api/v1/ws
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    environment:
+      - BACKUP_ROOT=/mnt/backups
+  e2e:
+    image: mcr.microsoft.com/playwright:v1.57.0-jammy
+    working_dir: /e2e
+    volumes:
+      - ./e2e:/e2e
+      - ./fixtures/destination:/mnt/backups_verify
+      - ./fixtures/decrypted:/mnt/decrypted
+      - ./secrets/ssh/id_ed25519_backup:/tmp/backup_key:ro
+    environment:
+      - BASE_URL=http://web:3000
+      - CI=true
+      - BACKUP_ROOT=/mnt/backups
+      - TEST=${TEST:-}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    depends_on:
+      web:
+        condition: service_healthy
+      ssh-source:
+        condition: service_started
+    command: sh -c "npx playwright test $${TEST}"
+    ipc: host
+
+  ssh-source:
+    build:
+      context: .
+      dockerfile: e2e/Dockerfile.ssh-source
+    volumes:
+      - ./secrets/ssh/id_ed25519_backup.pub:/mnt/public_key:ro
+      - ./fixtures/source:/mnt/source_data
+      - ./fixtures/destination:/mnt/backups:ro
+      - ./fixtures/decrypted:/mnt/decrypted
+    expose:
+      - "22"

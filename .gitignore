@@ -1,0 +1,10 @@
+cmd/server/__debug_bin*
+/server
+/justbackup
+/.env
+/main
+secrets
+/e2e/node_modules
+e2e/playwright/.auth/admin.json
+/justbackup
+fixtures/

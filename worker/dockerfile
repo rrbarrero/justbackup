@@ -1,0 +1,54 @@
+# Builder stage
+FROM golang:alpine AS builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY internal ./internal
+COPY worker ./worker
+
+RUN go build -o worker-app ./worker/main.go
+
+# Runtime stage
+FROM alpine:3.22.2
+
+# Add build arguments for UID and GID
+ARG WORKER_UID=1000
+ARG WORKER_GID=1000
+
+# install dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    openssh-client \
+    tzdata \
+    rsync \
+    postgresql16-client \
+    mariadb-client \
+    mongodb-tools \
+    bash && \
+    addgroup -g ${WORKER_GID} backup && \
+    adduser -D -u ${WORKER_UID} -G backup -h /home/backup backup
+
+# Create plugins directory
+RUN mkdir -p /app/plugins
+COPY worker/plugins/*.sh /app/plugins/
+RUN chmod +x /app/plugins/*.sh
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /app/worker-app /app/worker
+
+# User
+USER backup
+
+# ssh folder
+RUN mkdir -p /home/backup/.ssh
+
+# SSH key path
+ENV SSH_KEY_PATH=/home/backup/.ssh/id_ed25519
+
+# Run worker
+ENTRYPOINT ["/app/worker"]

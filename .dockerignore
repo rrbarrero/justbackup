@@ -1,0 +1,10 @@
+.git
+.env
+secrets/
+node_modules/
+web/node_modules/
+dist/
+build/
+server
+justbackup
+*.log

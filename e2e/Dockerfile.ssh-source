@@ -1,0 +1,42 @@
+# Build stage for CLI
+FROM golang:1.25-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o justbackup cmd/client/main.go
+
+# Final stage
+FROM alpine:3.22.2
+
+RUN apk add --no-cache openssh rsync bash shadow
+
+# Copy justbackup CLI from builder
+COPY --from=builder /app/justbackup /usr/local/bin/justbackup
+
+# Generate host keys
+RUN ssh-keygen -A
+
+# Create user with password "password" (fallback)
+# We will primarily use key-based auth
+RUN adduser -D -h /home/backup-test -s /bin/bash backup-test && \
+    echo "backup-test:password" | chpasswd
+
+# Setup SSH keys directory
+RUN mkdir -p /home/backup-test/.ssh && \
+    chmod 700 /home/backup-test/.ssh && \
+    chown backup-test:backup-test /home/backup-test/.ssh
+
+# Allow password auth (optional, but good for testing connection)
+# Allow root login no (default)
+# LogLevel VERBOSE for debugging
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#LogLevel INFO/LogLevel VERBOSE/' /etc/ssh/sshd_config
+
+# Expose port
+EXPOSE 22
+
+# Entrypoint script to setup authorized keys from mounted volume and start sshd
+COPY e2e/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["/usr/sbin/sshd", "-D", "-e"]

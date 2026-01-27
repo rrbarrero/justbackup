@@ -1,0 +1,113 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "8080:8080"
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - CORS_ALLOWED_ORIGIN=${CORS_ALLOWED_ORIGIN}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - BACKUP_ROOT=${BACKUP_ROOT}
+      - JWT_SECRET=${JWT_SECRET}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - SSH_PUBLIC_KEY_PATH=/etc/justbackup/ssh/public.key
+    volumes:
+      - ./secrets/ssh/id_ed25519_backup.pub:/etc/justbackup/ssh/public.key:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+      args:
+        APP_URL: ${APP_URL}
+        BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL:-http://server:8080}
+        NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL}
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - APP_URL=${APP_URL}
+      - BACKEND_INTERNAL_URL=${BACKEND_INTERNAL_URL:-http://server:8080}
+      - JWT_SECRET=${JWT_SECRET}
+      - BACKUP_ROOT=${BACKUP_ROOT}
+    depends_on:
+      - server
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+  worker:
+    build:
+      context: .
+      dockerfile: worker/dockerfile
+      args:
+        WORKER_UID: ${WORKER_UID:-1000}
+        WORKER_GID: ${WORKER_GID:-1000}
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - SSH_KEY_PATH=/home/backup/.ssh/id_ed25519_backup
+      - REDIS_URL=${REDIS_HOST}:${REDIS_PORT}
+      - BACKUP_ROOT=/mnt/backups
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - BACKEND_INTERNAL_URL=${BACKEND_INTERNAL_URL:-http://server:8080}
+    volumes:
+      - ./secrets/ssh/id_ed25519_backup:/home/backup/.ssh/id_ed25519_backup:ro
+      - ./secrets/ssh/known_hosts:/home/backup/.ssh/known_hosts:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ${BACKUP_ROOT}:/mnt/backups
+      - ./fixtures/source:/mnt/source_data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  postgres_data:
