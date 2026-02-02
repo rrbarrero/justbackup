@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/rrbarrero/justbackup/internal/notification/domain/entities"
 	shared "github.com/rrbarrero/justbackup/internal/shared/domain"
@@ -40,30 +41,36 @@ func (r *NotificationRepositoryPostgres) GetSettings(ctx context.Context, userID
 		return nil, shared.ErrNotFound
 	}
 	if err != nil {
+		log.Printf("ERROR: Database scan error for userID=%d, provider=%s: %v", userID, providerType, err)
 		return nil, err
 	}
 
 	// Unwrap JSON object
 	var wrapper map[string]string
 	if err := json.Unmarshal(config, &wrapper); err != nil {
+		log.Printf("ERROR: failed to unmarshal notification config wrapper for user %d, provider %s: %v", userID, providerType, err)
 		return nil, fmt.Errorf("failed to unmarshal notification config wrapper: %w", err)
 	}
 
 	encryptedBase64, ok := wrapper["encrypted"]
 	if !ok {
-		return nil, fmt.Errorf("config is not encrypted (missing 'encrypted' key)")
+		log.Printf("WARNING: notification config for user %d, provider %s is not encrypted", userID, providerType)
+		return entities.NewNotificationSettings(uid, pType, json.RawMessage("{}"), enabled), nil
 	}
 
 	// Decode Base64
 	decodedConfig, err := base64.StdEncoding.DecodeString(encryptedBase64)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode notification config from base64: %w", err)
+		log.Printf("ERROR: failed to decode notification config from base64 for user %d, provider %s: %v", userID, providerType, err)
+		return entities.NewNotificationSettings(uid, pType, json.RawMessage("{}"), enabled), nil
 	}
 
 	// Decrypt config
 	decryptedConfig, err := r.cryptoSvc.Decrypt(decodedConfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decrypt notification config: %w", err)
+		log.Printf("SECURITY_ERROR: failed to decrypt notification config for user %d, provider %s: %v. Ciphertext length: %d", userID, providerType, err, len(decodedConfig))
+		// We return a clean object even if decryption fails to avoid breaking the UI
+		return entities.NewNotificationSettings(uid, pType, json.RawMessage("{}"), enabled), nil
 	}
 
 	return entities.NewNotificationSettings(uid, pType, json.RawMessage(decryptedConfig), enabled), nil
@@ -73,6 +80,7 @@ func (r *NotificationRepositoryPostgres) SaveSettings(ctx context.Context, setti
 	// Encrypt config
 	encryptedConfig, err := r.cryptoSvc.Encrypt([]byte(settings.Config))
 	if err != nil {
+		log.Printf("ERROR: failed to encrypt notification config for user %d: %v", settings.UserID, err)
 		return fmt.Errorf("failed to encrypt notification config: %w", err)
 	}
 
@@ -123,25 +131,28 @@ func (r *NotificationRepositoryPostgres) GetAllEnabledSettings(ctx context.Conte
 		// Unwrap JSON object
 		var wrapper map[string]string
 		if err := json.Unmarshal(config, &wrapper); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal notification config wrapper for user %d: %w", uid, err)
+			log.Printf("ERROR: failed to unmarshal notification config wrapper for user %d: %v", uid, err)
+			continue // Skip corrupted entry
 		}
 
 		encryptedBase64, ok := wrapper["encrypted"]
 		if !ok {
-			return nil, fmt.Errorf("config for user %d is not encrypted", uid)
+			log.Printf("WARNING: config for user %d is not encrypted", uid)
+			continue
 		}
 
 		// Decode Base64
 		decodedConfig, err := base64.StdEncoding.DecodeString(encryptedBase64)
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode notification config from base64 for user %d: %w", uid, err)
+			log.Printf("ERROR: failed to decode notification config from base64 for user %d: %v", uid, err)
+			continue
 		}
 
 		// Decrypt config
 		decryptedConfig, err := r.cryptoSvc.Decrypt(decodedConfig)
 		if err != nil {
-			// Return error if decryption fails to ensure data integrity.
-			return nil, fmt.Errorf("failed to decrypt notification config for user %d: %w", uid, err)
+			log.Printf("SECURITY_ERROR: failed to decrypt notification config for user %d: %v", uid, err)
+			continue
 		}
 
 		settingsList = append(settingsList, entities.NewNotificationSettings(uid, pType, json.RawMessage(decryptedConfig), enabled))

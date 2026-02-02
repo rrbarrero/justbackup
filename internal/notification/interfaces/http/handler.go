@@ -74,13 +74,13 @@ func (h *NotificationHandler) GetSettings(w http.ResponseWriter, r *http.Request
 			return
 		}
 	}
-
 	resp := dto.NotificationSettingsResponse{
 		ProviderType: settings.ProviderType,
 		Config:       configMap,
 		Enabled:      settings.Enabled,
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		log.Printf("Failed to encode response: %v", err)
 	}
@@ -108,9 +108,9 @@ func (h *NotificationHandler) UpdateSettings(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
 	configBytes, err := json.Marshal(req.Config)
 	if err != nil {
+		log.Printf("ERROR: Failed to marshal config map: %v", err)
 		http.Error(w, "Invalid config format", http.StatusBadRequest)
 		return
 	}
